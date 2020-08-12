@@ -9,14 +9,15 @@ services:
       - "3001:3001"
       - "$MIN_PORT-$MAX_PORT:$MIN_PORT-$MAX_PORT/udp"
       - "8080:8080"
-    networks:
-      - network
+    network_mode: "host"
+    # networks:
+    #   - network
     volumes:
-      - nuve-volume:/opt/licode/nuve/nuveClient/dist/
-      - erizo-volume:/opt/licode/erizo_controller/erizoClient/dist/
+      - project-volume:/opt/licode/
+      # - ./cert:/opt/licode/cert
       - /opt/videos:/tmp
     environment:
-      SSL: $SSL
+      SSL: "true"
       MIN_PORT: $MIN_PORT
       MAX_PORT: $MAX_PORT
       PUBLIC_IP: $PUBLIC_IP
@@ -30,8 +31,12 @@ services:
       - "443:443"
     depends_on:
       - server
-    networks:
-      - network
+    network_mode: "host"
+    # networks:
+      # - network
+    volumes:
+      - ./extras/docker/nginx/templates:/etc/nginx/templates
+      - ./cert:/cert
     environment:
         NGINX_ENVSUBST_TEMPLATE_SUFFIX: ".template"
         DOMAIN_NAME: $PUBLIC_IP
@@ -42,15 +47,19 @@ services:
     restart: unless-stopped
     depends_on:
       - server
-    networks:
-      - network
-    command: cp /usr/src/app/dist/nuve.js /usr/src/app/nuve.js
+    # networks:
+    #   - network
+    network_mode: "host"
+    command: > 
+      bash -c "cp /licode/nuve/nuveClient/dist/nuve.js /app/nuve.js && 
+              cp -r /licode/erizo_controller/erizoClient/dist/assets /app/public/ &&
+              cp /licode/licode_config.js /app &&
+              node basicServer.js"
     volumes:
-      - nuve-volume:/usr/src/app/dist
-      - erizo-volume:/usr/src/app/public/
+      - project-volume:/licode/
+      - ./cert:/app/cert
 volumes:
-  nuve-volume:
-  erizo-volume:
-networks:
-  network:
-    driver: bridge
+  project-volume:
+# networks:
+#   network:
+#     driver: bridge

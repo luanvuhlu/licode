@@ -10,6 +10,20 @@ You have two options to start using Licode:
 
 * If you are interested in contributing, want to get a better view of the Licode architecture or you don't trust those fancy containers - [How to build Licode from source](http://licode.readthedocs.io/en/master/from_source/)
 
+## Docker SSL without basic_example
+
+```bash
+cd licode
+export PUBLIC_IP=your-domain
+export MIN_PORT=30000
+export MAX_PORT=30050
+sudo cp /etc/letsencrypt/live/$PUBLIC_IP/fullchain.pem ./cert/cert.pem
+sudo cp /etc/letsencrypt/live/$PUBLIC_IP/privkey.pem ./cert/key.pem
+sudo chown ec2-user:ec2-user -R ./cert
+docker-compose up -d
+```
+
+
 ## Community Forums
 
 Most discussions take place in the [Licode discourse](http://discourse.lynckia.com/). Please feel free to jump in to discuss anything Licode or WebRTC related. This is also a good place to find answers for your Licode problems.

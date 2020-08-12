@@ -12,10 +12,10 @@ const N = require('./nuve');
 const fs = require('fs');
 const https = require('https');
 // eslint-disable-next-line import/no-unresolved
-const config = require('./../../licode_config');
+const config = require('./licode_config');
 
-config.erizoController.ssl_key = config.erizoController.ssl_key || '../../cert/key.pem';
-config.erizoController.ssl_cert = config.erizoController.ssl_cert || '../../cert/cert.pem';
+config.erizoController.ssl_key = config.erizoController.ssl_key || './cert/key.pem';
+config.erizoController.ssl_cert = config.erizoController.ssl_cert || './cert/cert.pem';
 config.basicExample.nuveUrl = config.basicExample.nuveUrl || 'http://localhost:3000/';
 
 config.basicExample.logger = config.basicExample.logger || {};

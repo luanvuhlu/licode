@@ -126,13 +126,6 @@ run_erizoAgent() {
     node erizoAgent.js &
   fi
 }
-run_basicExample() {
-  echo "Starting basicExample"
-  sleep 5
-  cp $ROOT/nuve/nuveClient/dist/nuve.js $EXTRAS/basic_example/
-  cd $EXTRAS/basic_example
-  node basicServer.js &
-}
 
 parse_arguments $*
 
@@ -185,10 +178,5 @@ if [ "$ERIZOAGENT" == "true" ]; then
   fi
   run_erizoAgent
 fi
-
-if [ "$BASICEXAMPLE" == "true" ]; then
-  run_basicExample
-fi
-
 
 wait
