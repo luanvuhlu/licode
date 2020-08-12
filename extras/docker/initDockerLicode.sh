@@ -179,6 +179,10 @@ if [ "$ERIZOAGENT" == "true" ]; then
   if [[ ! -z "$NETWORK_INTERFACE" ]]; then
     echo "config.erizo.networkinterface = '$NETWORK_INTERFACE';" >> /opt/licode/licode_config.js
   fi
+  if [ "$SSL" == "true" ]; then
+    sed -i '67s/.*/config.erizoController.port = 443; \/\/default value: 8080/' /opt/licode/licode_config.js
+    sed -i '69s/.*/config.erizoController.ssl = true; \/\/default value: false/' /opt/licode/licode_config.js
+  fi
   run_erizoAgent
 fi
 

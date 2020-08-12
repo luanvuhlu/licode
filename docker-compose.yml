@@ -1,0 +1,56 @@
+version: "3"
+services:
+  server:
+    image: luanvv/licode-ssl:0.1
+    restart: unless-stopped
+    container_name: video-cf-server
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+      - "$MIN_PORT-$MAX_PORT:$MIN_PORT-$MAX_PORT/udp"
+      - "8080:8080"
+    networks:
+      - network
+    volumes:
+      - nuve-volume:/opt/licode/nuve/nuveClient/dist/
+      - erizo-volume:/opt/licode/erizo_controller/erizoClient/dist/
+      - /opt/videos:/tmp
+    environment:
+      SSL: $SSL
+      MIN_PORT: $MIN_PORT
+      MAX_PORT: $MAX_PORT
+      PUBLIC_IP: $PUBLIC_IP
+      NETWORK_INTERFACE: "eth0"
+      BASICEXAMPLE: "false"
+  nginx:
+    image: nginx:1.19-alpine
+    container_name: video-cf-nginx
+    restart: unless-stopped
+    ports:
+      - "443:443"
+    depends_on:
+      - server
+    networks:
+      - network
+    environment:
+        NGINX_ENVSUBST_TEMPLATE_SUFFIX: ".template"
+        DOMAIN_NAME: $PUBLIC_IP
+  client:
+    build:
+      context: ./extras/basic_example
+    container_name: video-cf-client
+    restart: unless-stopped
+    depends_on:
+      - server
+    networks:
+      - network
+    command: cp /usr/src/app/dist/nuve.js /usr/src/app/nuve.js
+    volumes:
+      - nuve-volume:/usr/src/app/dist
+      - erizo-volume:/usr/src/app/public/
+volumes:
+  nuve-volume:
+  erizo-volume:
+networks:
+  network:
+    driver: bridge

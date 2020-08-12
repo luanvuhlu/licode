@@ -1,9 +1,8 @@
 FROM ubuntu:16.04
 
-MAINTAINER Lynckia
+LABEL maintainer="luanvuhlu@gmail.com"
 
 WORKDIR /opt
-
 
 # Download latest version of the code and install dependencies
 RUN  apt-get update && apt-get install -y git wget curl
@@ -26,8 +25,7 @@ RUN mkdir /opt/licode/.git
 WORKDIR /opt/licode/scripts
 
 RUN ./installErizo.sh -dfeacs && \
-    ./../nuve/installNuve.sh && \
-    ./installBasicExample.sh
+    ./../nuve/installNuve.sh
 
 WORKDIR /opt/licode
 
