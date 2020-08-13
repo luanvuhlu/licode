@@ -57,6 +57,7 @@ services:
               node basicServer.js"
     volumes:
       - project-volume:/licode/
+      - ./extras/basic_example/public/lib:/app/public/lib
       - ./cert:/app/cert
 volumes:
   project-volume:

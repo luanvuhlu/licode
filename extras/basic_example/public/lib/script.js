@@ -80,6 +80,28 @@ function toggleSlideShowMode() {
   });
 }
 
+function make_id(length) {
+  var result           = '';
+  var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  var charactersLength = characters.length;
+  for ( var i = 0; i < length; i++ ) {
+     result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}
+
+function sendChat(){
+  const textarea = document.getElementById('chatField')
+  const content = textarea.value
+  if(typeof localStream == 'undefined' || content.trim() == ''){
+    return;
+  }
+  localStream.sendData(content);
+  const div = document.createElement('div');
+  div.innerHTML = '<b>me:</b> ' + content
+  document.getElementById('chatContainer').appendChild(div)
+  textarea.value = ''
+}
 const startBasicExample = () => {
   document.getElementById('startButton').disabled = true;
   document.getElementById('slideShowMode').disabled = false;
@@ -91,7 +113,9 @@ const startBasicExample = () => {
     video: !configFlags.onlyAudio,
     data: true,
     screen: configFlags.screen,
-    attributes: {} };
+    attributes: {
+      name: make_id(7)
+    } };
   // If we want screen sharing we have to put our Chrome extension id.
   // The default one only works in our Lynckia test servers.
   // If we are not using chrome, the creation of the stream will fail regardless.
@@ -148,7 +172,11 @@ const startBasicExample = () => {
     };
 
     room.addEventListener('room-connected', (roomEvent) => {
-      const options = { metadata: { type: 'publisher' } };
+      const options = { 
+        metadata: { type: 'publisher' },
+        maxVideoBW:20000, 
+        minVideoBW: 10000
+      };
       if (configFlags.simulcast) options.simulcast = { numSpatialLayers: 2 };
       subscribeToStreams(roomEvent.streams);
 
@@ -166,18 +194,27 @@ const startBasicExample = () => {
     room.addEventListener('stream-subscribed', (streamEvent) => {
       const stream = streamEvent.stream;
       const div = document.createElement('div');
-      div.setAttribute('style', 'width: 320px; height: 240px;float:left;');
+      div.setAttribute('style', 'width: 480px; height: 360px;float:left;');
       div.setAttribute('id', `test${stream.getID()}`);
 
       document.getElementById('videoContainer').appendChild(div);
       stream.show(`test${stream.getID()}`);
+
+      stream.addEventListener("stream-data", function(evt){
+        console.log('Received data ', evt.msg, 'from stream ', evt.stream.getAttributes().name);
+        const div = document.createElement('div');
+        div.innerHTML = '<b>' + evt.stream.getAttributes().name + ':</b> ' + evt.msg
+        document.getElementById('chatContainer').appendChild(div)
+      });
     });
 
     room.addEventListener('stream-added', (streamEvent) => {
       const streams = [];
       streams.push(streamEvent.stream);
       if (localStream) {
-        localStream.setAttributes({ type: 'publisher' });
+        const attrs = localStream.getAttributes();
+        attrs.type = 'publisher';
+        localStream.setAttributes(attrs);
       }
       subscribeToStreams(streams);
       document.getElementById('recordButton').disabled = false;
@@ -200,7 +237,7 @@ const startBasicExample = () => {
       room.connect({ singlePC: configFlags.singlePC });
     } else {
       const div = document.createElement('div');
-      div.setAttribute('style', 'width: 320px; height: 240px; float:left');
+      div.setAttribute('style', 'width: 480px; height: 360px; float:left');
       div.setAttribute('id', 'myVideo');
       document.getElementById('videoContainer').appendChild(div);
 
@@ -211,6 +248,8 @@ const startBasicExample = () => {
       localStream.init();
     }
   });
+
+  
 };
 
 window.onload = () => {
